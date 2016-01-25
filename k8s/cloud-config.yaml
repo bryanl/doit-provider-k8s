@@ -1,0 +1,14 @@
+#cloud-config
+
+coreos:
+  units:
+    - name: etcd2.service
+      command: start
+    - name: flanneld.service
+      drop-ins: 
+      - name: 50-network-config.conf
+        content: |
+          [Service]
+          ExecStartPre=/usr/bin/etcdctl set /coreos.com/network/config '{ "Network": "10.3.0.0/16" }'
+      command: start
+
