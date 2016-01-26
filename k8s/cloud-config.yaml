@@ -1,6 +1,17 @@
 #cloud-config
 
 coreos:
+  etcd2:
+    advertise-client-urls: https://$public_ipv4:2379,https://$public_ipv4:4001
+    listen-client-urls: https://0.0.0.0:2379,https://0.0.0.0:4001
+  flannel:
+    etcd_cafile: /home/core/ssl/ca.pem
+    etcd_certfile: /home/core/ssl/admin.pem
+    etcd_keyfile: /home/core/ssl/admin-key.pem
+  locksmith:
+    etcd_cafile: /home/core/ssl/ca.pem
+    etcd_certfile: /home/core/ssl/client.pem
+    etcd_keyfile: /home/core/ssl/client-key.pem
   units:
     - name: etcd2.service
       command: start
@@ -11,4 +22,13 @@ coreos:
           [Service]
           ExecStartPre=/usr/bin/etcdctl set /coreos.com/network/config '{ "Network": "10.3.0.0/16" }'
       command: start
+write_files:
+  - path: /run/systemd/system/etcd2.service.d/30-certificates.conf
+    permissions: 0644
+    content: |
+      [Service]
+      # client environment variables
+      Environment=ETCD_CA_FILE=/home/core/ssl/ca.pem
+      Environment=ETCD_CERT_FILE=/home/core/ssl/apiserver.pem
+      Environment=ETCD_KEY_FILE=/home/core/ssl/apiserver-key.pem
 

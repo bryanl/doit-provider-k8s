@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	k, err := k8s.New("tcluster", "tor1", "/tmp/foobar")
+	k, err := k8s.New("tcluster", "nyc1", "/tmp/foobar")
 	if err != nil {
 		log.Fatalf("build cluster management instance: %v", err)
 	}
